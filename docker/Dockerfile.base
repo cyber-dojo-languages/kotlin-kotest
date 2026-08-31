@@ -11,3 +11,10 @@ RUN apk add --virtual=build-dependencies maven \
   && rm -rf pom.xml ~/.m2 /tmp/* /var/cache/apk/*
 
 ENV CLASSPATH=/kotlin/
+
+# Dumped here so that every run can replay them instead of loading the same
+# classes from the jars again. They cost about 97MB of image and save about half
+# a second of every run. The script explains which classes and why.
+COPY dump_cds_archives.sh .
+RUN sh dump_cds_archives.sh \
+  && rm dump_cds_archives.sh
