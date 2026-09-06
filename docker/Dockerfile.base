@@ -12,9 +12,10 @@ RUN apk add --virtual=build-dependencies maven \
 
 ENV CLASSPATH=/kotlin/
 
-# Dumped here so that every run can replay them instead of loading the same
-# classes from the jars again. They cost about 97MB of image and save about half
-# a second of every run. The script explains which classes and why.
-COPY dump_cds_archives.sh .
-RUN sh dump_cds_archives.sh \
-  && rm dump_cds_archives.sh
+# Recorded here so that every run replays them instead of doing the same work
+# again. The compiler gets an AOT cache and the test launcher a class-data
+# archive; the script explains why they differ. Together they cost about 140MB
+# of image and take a run from about 1.5s to about 0.8s.
+COPY record_startup_archives.sh .
+RUN sh record_startup_archives.sh \
+  && rm record_startup_archives.sh
