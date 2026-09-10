@@ -1,4 +1,4 @@
-FROM ghcr.io/cyber-dojo-languages/kotlin:ad5c23a
+FROM ghcr.io/cyber-dojo-languages/kotlin:d564fcf
 LABEL maintainer=jon@jaggersoft.com
 
 # maven resolves the jars named in pom.xml into /kotlin at build time. It and
