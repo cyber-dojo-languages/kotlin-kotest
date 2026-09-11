@@ -28,6 +28,30 @@ set -eu
 # below is shaped like a real one: a source file, and a kotest spec asserting
 # against it. Archives recorded from this kata speed up any other, the classes
 # being the compiler's and the engine's rather than the kata's.
+#
+# It does not mock, although the start-point does, and mockk's classes are
+# not in either cache. That costs a test run about 0.43s, measured against
+# the same kata with the mocking taken out, and four ways of recovering it
+# were tried and none worked:
+#
+#   mocking while recording. mockk instruments through a byte-buddy agent it
+#   loads at run time, and the writer excludes instrumented classes. It ends
+#   up excluding java.lang.Object and reports
+#     Critical class java.lang.Object has been excluded
+#
+#   loading mockk's classes while recording without mocking, which is where
+#   0.26s of the 0.43s goes and which instruments nothing. The writer
+#   segfaults in ArchiveBuilder::dump_ro_metadata.
+#
+#   naming the agent with -javaagent at startup rather than letting
+#   byte-buddy attach it. Worth about 0.02s, which is noise.
+#
+#   -Dmockk.agent=subclass, which mocks by subclassing rather than
+#   instrumenting. Level with the default, and it cannot mock a final class,
+#   which every Kotlin class is unless opened.
+#
+# So what is cached here is everything around mockk. Do not spend the
+# afternoon on it again without a newer JDK to try it on.
 
 readonly WORK_DIR=/tmp/record_startup_archives
 readonly CLASSES=".:$(ls /kotlin/*.jar | tr '\n' ':')"

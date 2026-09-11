@@ -18,6 +18,7 @@
   <properties>
     <kotest.version>6.2.4</kotest.version>
     <junit.platform.version>1.13.4</junit.platform.version>
+    <mockk.version>1.14.11</mockk.version>
   </properties>
 
   <dependencies>
@@ -40,6 +41,14 @@
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-console-standalone</artifactId>
       <version>${junit.platform.version}</version>
+    </dependency>
+    <!-- The mocking library. mockk-jvm rather than mockk, because mockk is a
+         multiplatform pom whose jvm variant is this one, and what the image
+         needs is the jar. -->
+    <dependency>
+      <groupId>io.mockk</groupId>
+      <artifactId>mockk-jvm</artifactId>
+      <version>${mockk.version}</version>
     </dependency>
   </dependencies>
 </project>

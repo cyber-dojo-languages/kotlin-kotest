@@ -13,9 +13,9 @@ RUN apk add --virtual=build-dependencies maven \
 ENV CLASSPATH=/kotlin/
 
 # Recorded here so that every run replays them instead of doing the same work
-# again. The compiler gets an AOT cache and the test launcher a class-data
-# archive; the script explains why they differ. Together they cost about 140MB
-# of image and take a run from about 1.5s to about 0.8s.
+# again. The compiler and the test launcher each get an AOT cache; the script
+# explains what is in them. Together they cost about 140MB of image and take a
+# run from about 1.5s to about 0.8s.
 COPY record_startup_archives.sh .
 RUN sh record_startup_archives.sh \
   && rm record_startup_archives.sh
