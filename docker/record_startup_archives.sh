@@ -12,19 +12,17 @@ set -eu
 # JVMs would otherwise load every class from the jars every time. Compiling is
 # about 85% of a run, so the compiler is where nearly all of the saving is.
 #
-# The two are not recorded the same way, because measuring them said they want
-# different things:
+# Both get an AOT cache. It holds classes already linked, which a class-data
+# archive does not, and for the compiler that is worth about 700ms. For the
+# test launcher the two measured level, so nothing is lost by using the same
+# mechanism for both, and a dependency is: a class-data archive is written
+# with -XX:ArchiveClassesAtExit, which refuses to run unless the JDK has a
+# base archive loaded, and this one has none.
 #
-#   the compiler gets an AOT cache. It holds classes already linked, which a
-#   class-data archive does not, and that is worth about 700ms. It has to be
-#   recorded against the compiler started directly, as cyber-dojo.sh starts it.
-#   Recorded against the kotlinc script, which runs the compiler behind a
-#   Preloader with a classloader of its own, the cache made the run slower than
-#   having no cache at all.
-#
-#   the test launcher keeps a class-data archive. An AOT cache was measured
-#   here too and came out level with it, so there is nothing to be gained by
-#   changing it.
+# The compiler's cache has to be recorded against the compiler started
+# directly, as cyber-dojo.sh starts it. Recorded against the kotlinc script,
+# which runs the compiler behind a Preloader with a classloader of its own,
+# the cache made the run slower than having no cache at all.
 #
 # The classes recorded are the ones a run actually loads, so the throwaway kata
 # below is shaped like a real one: a source file, and a kotest spec asserting
@@ -76,7 +74,7 @@ java -XX:AOTCacheOutput=/kotlin/kotlinc.aot \
   -cp "${COMPILER_JAR}" "${COMPILER_MAIN}" \
   Answer.kt AnswerTest.kt -cp "${CLASSES}" -d .
 
-java -XX:ArchiveClassesAtExit=/kotlin/junit.jsa \
+java -XX:AOTCacheOutput=/kotlin/junit.aot \
   -jar "${LAUNCHER}" \
   execute \
   --class-path "${CLASSES}" \
@@ -85,9 +83,9 @@ java -XX:ArchiveClassesAtExit=/kotlin/junit.jsa \
   --disable-ansi-colors
 
 # The sandbox user reads these at run time and owns nothing here.
-chmod 0644 /kotlin/kotlinc.aot /kotlin/junit.jsa
+chmod 0644 /kotlin/kotlinc.aot /kotlin/junit.aot
 
 cd /
 rm -rf "${WORK_DIR}"
 
-ls -l /kotlin/kotlinc.aot /kotlin/junit.jsa
+ls -l /kotlin/kotlinc.aot /kotlin/junit.aot
