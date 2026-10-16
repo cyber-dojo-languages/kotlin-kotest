@@ -9,15 +9,15 @@
 
   <!-- Nothing is built from this pom. It exists so maven can resolve the test
        framework's transitive closure and copy it into the image, which is what
-       keeps the jars themselves out of git and the versions in one place.
+       keeps the jars themselves out of git.
 
-       The console launcher tracks kotest's junit-platform version, not its own
-       newest release: kotest 6.2.4 uses platform 1.13.4, and the launcher has
-       a separate 6.x line that would not match it. -->
+       The versions below are a floor. install_jars.sh moves each to its newest
+       release before anything is resolved. The console launcher is not listed
+       because it has to match the junit-platform version kotest pulls in, so
+       install_jars.sh fetches it once that version is known. -->
 
   <properties>
     <kotest.version>6.2.4</kotest.version>
-    <junit.platform.version>1.13.4</junit.platform.version>
     <mockk.version>1.14.11</mockk.version>
   </properties>
 
@@ -36,11 +36,6 @@
       <groupId>io.kotest</groupId>
       <artifactId>kotest-property-jvm</artifactId>
       <version>${kotest.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-console-standalone</artifactId>
-      <version>${junit.platform.version}</version>
     </dependency>
     <!-- The mocking library. mockk-jvm rather than mockk, because mockk is a
          multiplatform pom whose jvm variant is this one, and what the image
