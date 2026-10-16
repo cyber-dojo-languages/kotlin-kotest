@@ -14,8 +14,10 @@ ENV CLASSPATH=/kotlin/
 
 # Recorded here so that every run replays them instead of doing the same work
 # again. The compiler and the test launcher each get an AOT cache; the script
-# explains what is in them. Together they cost about 140MB of image and take a
-# run from about 1.5s to about 0.8s.
+# explains what is in them. The script also builds /kotlin/kata-tests, which
+# cyber-dojo.sh runs the tests through, so that the test JVM can get going
+# while the kata is still compiling.
 COPY record_startup_archives.sh .
+COPY kata_tests/ kata_tests/
 RUN sh record_startup_archives.sh \
-  && rm record_startup_archives.sh
+  && rm -rf record_startup_archives.sh kata_tests
